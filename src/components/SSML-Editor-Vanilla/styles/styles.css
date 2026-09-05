@@ -437,19 +437,12 @@
   user-select: none;
 }
 
-/*
- * Hidden contenteditable host that captures all keyboard / IME input.
- * Kept invisible (opacity:0) and off-screen by default; positioned at
- * the caret during editing so the OS IME candidate window tracks the
- * cursor.  position:absolute (not fixed) avoids being hijacked by an
- * ancestor CSS transform (e.g. inside a modal with entry animation).
- */
 .se-vanilla .se-input-host {
   position: absolute;
   top: -9999px;
   left: -9999px;
   width: max-content;
-  min-width: 240px;
+  min-width: 0;
   min-height: 2rem;
   padding: 0;
   margin: 0;

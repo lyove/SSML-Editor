@@ -40,13 +40,14 @@ export class SelectionService {
     if (!host) {
       return;
     }
-    const comp = ctx.container.querySelector<HTMLElement>(".se-composing");
-    const caret = comp ? null : ctx.container.querySelector<HTMLElement>(".se-caret");
+    const caret = ctx.container.querySelector<HTMLElement>(".se-caret");
+    const comp = caret ? null : ctx.container.querySelector<HTMLElement>(".se-composing");
     let rect: DOMRect | null = null;
-    if (comp) {
-      rect = comp.getBoundingClientRect();
-    } else if (caret) {
+    if (caret) {
       rect = caret.getBoundingClientRect();
+    } else if (comp) {
+      const r = comp.getBoundingClientRect();
+      rect = new DOMRect(r.right, r.top, 0, r.height);
     } else {
       const c = ctx.state.cursor;
       if (c) {
@@ -72,9 +73,53 @@ export class SelectionService {
       host.style.top = "-9999px";
       return;
     }
-    const containerRect = ctx.container.getBoundingClientRect();
-    host.style.left = `${Math.round(rect.left - containerRect.left)}px`;
-    host.style.top = `${Math.round(rect.top - containerRect.top)}px`;
+    const containingBlock = this.findContainingBlock();
+    const cbRect = containingBlock.getBoundingClientRect();
+    host.style.left = `${Math.round(rect.left - cbRect.left)}px`;
+    host.style.top = `${Math.round(rect.top - cbRect.top)}px`;
+  }
+
+  /**
+   * Find the real containing block for the hidden input host.
+   */
+  private findContainingBlock(): HTMLElement {
+    const host = this.ctx.inputHost;
+    if (!host) {
+      return document.documentElement as HTMLElement;
+    }
+    let el: HTMLElement | null = host.parentElement;
+    let positionedFallback: HTMLElement | null = null;
+    while (el) {
+      const cs = window.getComputedStyle(el);
+      const contain = cs.contain || "";
+      if (
+        contain.includes("layout") ||
+        contain.includes("paint") ||
+        contain.includes("strict") ||
+        contain.includes("content")
+      ) {
+        return el;
+      }
+      const transform = cs.transform;
+      const perspective = cs.perspective;
+      const filter = cs.filter;
+      const willChange = cs.willChange || "";
+      if (
+        (transform && transform !== "none") ||
+        (perspective && perspective !== "none") ||
+        (filter && filter !== "none") ||
+        willChange.includes("transform") ||
+        willChange.includes("perspective") ||
+        willChange.includes("filter")
+      ) {
+        return el;
+      }
+      if (cs.position !== "static" && !positionedFallback) {
+        positionedFallback = el;
+      }
+      el = el.parentElement;
+    }
+    return positionedFallback ?? (document.documentElement as HTMLElement);
   }
 
   focusInputHost(): void {

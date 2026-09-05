@@ -136,7 +136,10 @@ export class RenderService {
   private syncPlaceholder(): void {
     const { ctx } = this;
     const shouldShow =
-      !!ctx.placeholder && isEmptyModel(ctx.state.model) && !ctx.state.composingText;
+      !!ctx.placeholder &&
+      isEmptyModel(ctx.state.model) &&
+      !ctx.state.composingText &&
+      !ctx.state.isComposing;
     const existing = ctx.content.querySelector<HTMLElement>(".se-placeholder");
     if (shouldShow && !existing) {
       const ph = document.createElement("div");

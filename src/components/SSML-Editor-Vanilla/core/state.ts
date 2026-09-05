@@ -115,6 +115,8 @@ export interface EditorState {
   focused: boolean;
   /** Current IME composition buffer */
   composingText: string;
+  /** Whether an IME composition is active (compositionstart -> compositionend) */
+  isComposing: boolean;
   /** Popover / context-menu / hover UI state */
   overlays: OverlayState;
   /** Render & incremental painting bookkeeping */
@@ -185,6 +187,7 @@ export function createEditorState(model: SSMLModel): EditorState {
     selRect: null,
     focused: false,
     composingText: "",
+    isComposing: false,
     overlays,
     render,
     flags,

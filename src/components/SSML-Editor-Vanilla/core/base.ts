@@ -130,6 +130,7 @@ export class SSMLEditor implements EditorContext {
     this.boundBlur = (e: FocusEvent) => {
       this.state.focused = false;
       this.state.composingText = "";
+      this.state.isComposing = false;
       this.state.flags.doubleClickPending = false;
       const to = e.relatedTarget;
       const internal =
@@ -172,6 +173,7 @@ export class SSMLEditor implements EditorContext {
     this.state.spans = null;
     this.state.cursor = null;
     this.state.composingText = "";
+    this.state.isComposing = false;
     this.state.render.forceFullRender = true;
     this.history.setValue(this.state.model);
     this.bus.emit("overlay:close");

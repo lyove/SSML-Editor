@@ -8,6 +8,7 @@
 
 .se-editor {
   position: relative;
+  contain: layout;
   line-height: 2rem;
   color: inherit;
   outline: none;

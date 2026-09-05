@@ -26,6 +26,8 @@ export class ImeService {
     }
     this.ensureCursorAtStart();
     this.ctx.state.composingText = "";
+    this.ctx.state.isComposing = true;
+    this.resetHostCaret();
     this.ctx.selection.positionInputHostToCursor();
   }
 
@@ -59,6 +61,7 @@ export class ImeService {
       return;
     }
     this.ctx.state.composingText = e.data;
+    this.ctx.state.isComposing = true;
     if (!this.ctx.state.flags.compositionRafId) {
       this.ctx.state.flags.compositionRafId = requestAnimationFrame(() => {
         this.ctx.state.flags.compositionRafId = 0;
@@ -72,6 +75,7 @@ export class ImeService {
     if (target?.closest?.(".se-ctx, .se-popover, .se-popup")) {
       return;
     }
+    this.ctx.state.isComposing = false;
     if (this.ctx.modalOpen()) {
       this.ctx.state.composingText = "";
       this.resetHostCaret();
@@ -175,6 +179,7 @@ export class ImeService {
     }
     ctx.bus.emit("cursor:change", cursor);
     ctx.state.composingText = "";
+    ctx.state.isComposing = false;
     if (spans) {
       ctx.history.commit(next);
     } else {
